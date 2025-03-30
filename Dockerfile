@@ -13,7 +13,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy the entire project
 COPY . /app
 
-# Set environment variables
+# Set environment variables dynamically (they will be passed at runtime)
 ENV PYTHONUNBUFFERED=1
 ENV DJANGO_SETTINGS_MODULE=go_mechanic.backend.settings
 ENV PYTHONPATH=/app
@@ -25,7 +25,7 @@ RUN mkdir -p /app/go_mechanic/staticfiles && chmod -R 777 /app/go_mechanic/stati
 # Debug: Check installed packages
 RUN pip list
 
-# Collect static files
+# Collect static files (these env variables should be passed at runtime)
 RUN python /app/go_mechanic/manage.py collectstatic --noinput
 
 # Expose port
