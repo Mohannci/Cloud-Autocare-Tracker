@@ -3,7 +3,7 @@ name: Deploy to AWS Elastic Beanstalk
 on:
   push:
     branches:
-      - none
+      - main
 
 jobs:
   deploy:
@@ -55,6 +55,6 @@ jobs:
         aws_session_token: ${{ secrets.AWS_SESSION_TOKEN }}
         application_name: Auto-care-tracker
         environment_name: Auto-care-tracker-env
-        region: ${{ secrets.AWS_DEFAULT_REGION }}
+        region: ${{ secrets.AWS_REGION }}
         version_label: "deploy-${{ env.IMAGE_TAG }}"
         deployment_package: Dockerrun.aws.json
