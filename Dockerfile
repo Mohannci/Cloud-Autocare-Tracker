@@ -14,7 +14,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . /app
  
 # Copy the .env file from the root directory to /app/go_mechanic
-COPY .env /app/go_mechanic/.env
+
  
 # Set environment variables before running collectstatic
 ENV PYTHONUNBUFFERED=1
