@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% block content %}
+    <h2>Add Vehicle</h2>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <label for="vehicle_name">Vehicle Name:</label><br>
+        <input type="text" name="vehicle_name" placeholder="e.g., Toyota Camry" required><br>
+        <label for="model">Model:</label><br>
+        <input type="text" name="model" placeholder="e.g., 2020" required><br>
+        <label for="year">Year:</label><br>
+        <input type="number" name="year" placeholder="e.g., 2020" required><br>
+        <label for="image">Image:</label><br>
+        <input type="file" name="image" accept="image/*"><br>
+        <div id="image-preview"></div>
+        <button type="submit">Add</button>
+    </form>
+{% endblock %}

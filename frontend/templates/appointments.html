@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% block content %}
+    <div class="row">
+        <div class="col-12">
+            <h2 class="text-center">Book an Appointment</h2>
+            <form method="post">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="date">Date:</label>
+                    <input type="date" name="date" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="time">Time:</label>
+                    <input type="time" name="time" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="vehicle_name">Vehicle Name:</label>
+                    <input type="text" name="vehicle_name" class="form-control" placeholder="e.g., Toyota Camry" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Book</button>
+            </form>
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-success mt-3">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}

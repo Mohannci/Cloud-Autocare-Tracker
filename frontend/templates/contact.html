@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% block content %}
+    <h2>Contact Us</h2>
+    <p>Email: support@autocaretracker.com</p>
+    <p>Phone: +1-800-555-1234</p>
+    <p>Address: 123 Service Lane, Auto City</p>
+    <form method="post">
+        {% csrf_token %}
+        <label for="name">Name:</label><br>
+        <input type="text" name="name" required><br>
+        <label for="email">Email:</label><br>
+        <input type="email" name="email" required><br>
+        <label for="message">Message:</label><br>
+        <textarea name="message" required></textarea><br>
+        <button type="submit">Send</button>
+    </form>
+{% endblock %}

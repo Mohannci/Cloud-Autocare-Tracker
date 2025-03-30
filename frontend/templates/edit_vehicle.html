@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% block content %}
+    <h2>Edit Vehicle</h2>
+    {% if vehicle %}
+        <form method="post">
+            {% csrf_token %}
+            <label for="vehicle_name">Vehicle Name:</label><br>
+            <input type="text" name="vehicle_name" value="{{ vehicle.vehicle_name }}" required><br>
+            <label for="model">Model:</label><br>
+            <input type="text" name="model" value="{{ vehicle.model }}" required><br>
+            <label for="year">Year:</label><br>
+            <input type="number" name="year" value="{{ vehicle.year }}" required><br>
+            <button type="submit">Update</button>
+        </form>
+    {% else %}
+        <p>Vehicle not found.</p>
+        <a href="{% url 'home' %}">Back to Home</a>
+    {% endif %}
+{% endblock %}

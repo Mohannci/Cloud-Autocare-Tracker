@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% block content %}
+    <h2>Maintenance Records</h2>
+    {% if error %}
+        <div class="alert alert-danger">{{ error }}</div>
+    {% endif %}
+    <form method="post">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="vehicle_id">Vehicle:</label>
+            <select name="vehicle_id" class="form-control" required onchange="this.form.submit()">
+                {% for vehicle in vehicles %}
+                    <option value="{{ vehicle.vehicle_id }}" {% if vehicle.vehicle_id == selected_vehicle_id %}selected{% endif %}>{{ vehicle.vehicle_name }} {{ vehicle.model }} ({{ vehicle.year }})</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="form-group" {% if not selected_vehicle_id %}style="display:none;"{% endif %}>
+            <label for="service_date">Service Date:</label>
+            <input type="date" name="service_date" class="form-control" required>
+        </div>
+        <div class="form-group" {% if not selected_vehicle_id %}style="display:none;"{% endif %}>
+            <label for="description">Description:</label>
+            <input type="text" name="description" class="form-control" required>
+        </div>
+        <div class="form-group" {% if not selected_vehicle_id %}style="display:none;"{% endif %}>
+            <label for="cost">Cost ($):</label>
+            <input type="number" name="cost" step="0.01" class="form-control" required>
+        </div>
+        <button type="submit" class="btn btn-primary" {% if not selected_vehicle_id %}disabled{% endif %}>Add Record</button>
+    </form>
+    <h3>Existing Records for Selected Vehicle</h3>
+    <ul class="list-group">
+        {% for record in maintenance_records %}
+            <li class="list-group-item">{{ record.service_date }} - {{ record.description }} - ${{ record.cost }}</li>
+        {% empty %}
+            <li class="list-group-item">No maintenance records yet for this vehicle.</li>
+        {% endfor %}
+    </ul>
+{% endblock %}
