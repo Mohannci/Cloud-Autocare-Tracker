@@ -5,42 +5,29 @@ FROM python:3.12-slim
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 
-# Set working directory
+# Set up the directory structure
 WORKDIR /app
-
-# Copy only requirements first for caching
-COPY go_mechanic/requirements.txt requirements.txt
-
-# Install dependencies
-RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy the entire project
 COPY . .
 
-# Set environment variables from build arguments
-ARG AWS_ACCESS_KEY_ID
-ARG AWS_SECRET_ACCESS_KEY
-ARG AWS_SESSION_TOKEN
-ARG AWS_REGION
-ARG AWS_S3_BUCKET
-ARG AWS_DYNAMODB_REGION
-ARG AWS_SNS_TOPIC_ARN
+# Install dependencies
+RUN pip install --no-cache-dir -r go_mechanic/requirements.txt
+RUN pip install gunicorn
 
-ENV AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
-ENV AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
-ENV AWS_SESSION_TOKEN=${AWS_SESSION_TOKEN}
-ENV AWS_REGION=${AWS_REGION}
-ENV AWS_S3_BUCKET=${AWS_S3_BUCKET}
-ENV AWS_DYNAMODB_REGION=${AWS_DYNAMODB_REGION}
-ENV AWS_SNS_TOPIC_ARN=${AWS_SNS_TOPIC_ARN}
+# Set environment variables
+ENV PYTHONPATH=/app:/app/go_mechanic
+ENV DJANGO_SETTINGS_MODULE=backend.settings
 
-# Collect static files and run migrations
-RUN python go_mechanic/manage.py migrate --no-input
-RUN python go_mechanic/manage.py collectstatic --no-input
+# Run migrations
+WORKDIR /app/go_mechanic
+RUN python manage.py migrate --no-input
 
-# Expose the port the app runs on
+# Collect static files
+RUN python manage.py collectstatic --no-input
+
+# Expose the port
 EXPOSE 8000
 
-# Start the application with Gunicorn
+# Entrypoint script
 CMD ["gunicorn", "--workers=4", "--timeout=180", "--bind=0.0.0.0:8000", "backend.wsgi:application"]
-
