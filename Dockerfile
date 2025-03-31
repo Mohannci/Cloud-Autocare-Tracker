@@ -5,45 +5,36 @@ FROM python:3.12-slim
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 
-# Set up the directory structure
+# Set up the working directory
 WORKDIR /app
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    libpq-dev \
+    gcc \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy requirements file first to leverage Docker cache
+COPY go_mechanic/requirements.txt requirements.txt
+
+# Install dependencies
+RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install gunicorn
 
 # Copy the entire project
 COPY . .
 
-# Create necessary __init__.py files to make directories proper Python packages
-RUN find . -type d -not -path "*/\.*" -exec touch {}/__init__.py \;
+# Set the PYTHONPATH
+ENV PYTHONPATH="/app:/app/go_mechanic"
 
-# Install dependencies
-RUN pip install --no-cache-dir -r go_mechanic/requirements.txt
-
-# Install additional dependencies that might be needed
-RUN pip install gunicorn
-
-# Set PYTHONPATH to include both the root directory and the go_mechanic directory
-ENV PYTHONPATH=/app:/app/go_mechanic
-
-# Set Django settings module
-ENV DJANGO_SETTINGS_MODULE=backend.settings
-
-# Run migrations from the go_mechanic directory
-WORKDIR /app/go_mechanic
-RUN python manage.py migrate --no-input
+# Run Django migrations
+RUN python go_mechanic/manage.py migrate --no-input
 
 # Collect static files
-RUN python manage.py collectstatic --no-input
+RUN python go_mechanic/manage.py collectstatic --no-input
 
 # Expose the port the app runs on
 EXPOSE 8000
 
-# Create a simple entrypoint script
-RUN echo '#!/bin/bash\n\
-cd /app/go_mechanic\n\
-exec gunicorn --workers=4 --timeout=180 --bind=0.0.0.0:8000 backend.wsgi:application\n\
-' > /app/entrypoint.sh
-
-# Make the entrypoint script executable
-RUN chmod +x /app/entrypoint.sh
-
-# Run the entrypoint script
-CMD ["/app/entrypoint.sh"]
+# Define the entrypoint
+CMD ["gunicorn", "--workers=4", "--timeout=180", "--bind=0.0.0.0:8000", "backend.wsgi:application"]
